@@ -1,0 +1,3 @@
+name = Feedback
+description = A module for the feedback link and form.
+core = 7.x

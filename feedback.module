@@ -1,0 +1,86 @@
+<?php
+/**
+ * @file
+ * Feedback module
+ */
+
+/**
+ * Implements hook_menu()
+ */
+
+function feedback_menu() {
+  $items['admin/appearance/feedback'] = array(
+    'title' => 'Feedback',
+    'description' => 'Edit Feedback link.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('feedback_admin_form'),
+    'access arguments' => array('administrator feedback'), 
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  return $items;
+}
+
+/**
+ * Admin form options.
+ */
+
+function feedback_admin_form($form,$form_state) {
+
+  $form['feedback_text'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Link text',
+    '#default_value' => variable_get('feedback_text','Feedback'),
+  );
+
+  $form['feedback_link'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Link',
+    '#default_value' => variable_get('feedback_link', 'contact'),
+  );
+  
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_permission()
+ */
+
+function feedback_permission() {
+  $permissions['administrator feedback'] = array(
+    'title' => t('Edit the Feedback link.'),
+  );
+  
+  return $permissions;
+}
+
+/**
+ * Implements hook_theme()
+ */
+
+function feedback_block_info (){
+  $info = array();
+  $info['feedback'] = array(
+    'info' => t('Feedback'),
+    'cache' => DRUPAL_NO_CACHE,
+  );
+  
+  return $info;
+}
+
+function feedback_block_view($delta){
+  $blocks = array();
+  if ($delta == 'feedback'){
+    drupal_add_css(drupal_get_path('module','feedback') . '/feedback.css', array('type'=>'file', 'group'=>CSS_DEFAULT));
+    $text = variable_get('feedback_text', 'Feedback');
+    $link = variable_get('feedback_link', 'contact');
+    $options = array();
+    
+    if (url_is_external($link) == TRUE){
+      $options = array('attributes' => array('target' => '_blank'));
+    }
+
+    $blocks['content'] = l($text, $link, $options);
+  }
+  return $blocks;
+}
